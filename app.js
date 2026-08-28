@@ -317,7 +317,7 @@
         <div class="flash-card ${state.flashFlipped ? "flipped" : ""}" data-action="flip" role="button" tabindex="0">
           <div class="flash-face front">
             <div class="flash-hint">${escapeHtml(catName(q.category))} · 問題</div>
-            <p>${nl(q.q)}</p>
+            <p>${q.starred ? `<span class="star-mark">★★★</span> ` : ""}${nl(q.q)}</p>
           </div>
           <div class="flash-face back">
             <div class="flash-hint">參考答案</div>

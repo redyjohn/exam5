@@ -491,6 +491,12 @@ main {
   margin-bottom: 0.75rem;
 }
 
+.star-mark {
+  color: var(--amber);
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
 .flash-face p {
   margin: 0;
   font-size: 1.1rem;
