@@ -1,6 +1,6 @@
 (() => {
   const DATA = window.BIM_DATA;
-  const STORAGE_KEY = "bim-practice-progress-v1";
+  const STORAGE_KEY = "bim-practice-progress-v2";
   const app = document.getElementById("app");
 
   const state = {
