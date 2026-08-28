@@ -139,6 +139,12 @@
     return escapeHtml(str).replace(/\n/g, "<br>");
   }
 
+  function starHtml(q) {
+    const n = Number(q.stars) || 0;
+    if (n <= 0) return "";
+    return `<span class="star-mark" aria-label="${n} 星重點">${"★".repeat(n)}</span> `;
+  }
+
   /* ---------- Views ---------- */
 
   function renderHome() {
@@ -221,7 +227,7 @@
             <span class="badge">${escapeHtml(catName(q.category))}</span>
             <span class="q-num">第 ${pos + 1} / ${list.length} 題</span>
           </div>
-          <p class="question-text">${nl(q.q)}</p>
+          <p class="question-text">${starHtml(q)}${nl(q.q)}</p>
           <label for="user-answer" class="progress-mini">寫下你的答案</label>
           <textarea id="user-answer" class="answer-box" placeholder="先回想再對照參考答案…"></textarea>
           <div class="card-actions">
@@ -317,7 +323,7 @@
         <div class="flash-card ${state.flashFlipped ? "flipped" : ""}" data-action="flip" role="button" tabindex="0">
           <div class="flash-face front">
             <div class="flash-hint">${escapeHtml(catName(q.category))} · 問題</div>
-            <p>${q.starred ? `<span class="star-mark">★★★</span> ` : ""}${nl(q.q)}</p>
+            <p>${starHtml(q)}${nl(q.q)}</p>
           </div>
           <div class="flash-face back">
             <div class="flash-hint">參考答案</div>
