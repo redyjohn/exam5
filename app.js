@@ -335,7 +335,7 @@
           </div>
         </div>
       </div>
-      <div class="card-actions" style="margin-top:1.25rem">
+      <div class="card-actions flash-actions">
         <button type="button" class="btn btn-ghost" data-action="prev">上一張</button>
         <button type="button" class="btn btn-ghost" data-action="next">下一張</button>
         <button type="button" class="btn btn-sm btn-primary" data-rate="known">已掌握</button>

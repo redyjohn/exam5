@@ -453,14 +453,14 @@ main {
 }
 
 .flash-card {
-  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
   width: 100%;
-  height: min(42rem, calc(100dvh - 14rem));
-  min-height: 17.5rem;
+  min-height: 12rem;
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
   cursor: pointer;
-  overflow: hidden;
 }
 
 .flash-card.flipped {
@@ -468,18 +468,22 @@ main {
 }
 
 .flash-face {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 12rem;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: var(--shadow);
-  padding: 1.25rem 1.2rem 1.15rem;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  padding: 1.25rem 1.2rem 1.2rem;
+}
+
+.flash-face.front {
+  transform: rotateY(0deg);
 }
 
 .flash-face.back {
@@ -496,15 +500,8 @@ main {
 
 .flash-body {
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 0.45rem 0.85rem 0;
-  display: grid;
-  align-content: start;
-  scrollbar-width: thin;
-  scrollbar-color: #c5d2da transparent;
+  min-width: 0;
+  overflow: visible;
 }
 
 .flash-body p {
@@ -512,20 +509,17 @@ main {
   font-size: 1.05rem;
   line-height: 1.7;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-.flash-body::-webkit-scrollbar {
-  width: 8px;
-}
-
-.flash-body::-webkit-scrollbar-thumb {
-  background: #c5d2da;
-  border-radius: 99px;
-}
-
-.flash-body::-webkit-scrollbar-track {
-  background: transparent;
+.flash-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin-top: 1rem;
+  padding: 0.85rem 0 0.35rem;
+  background: linear-gradient(180deg, transparent, var(--paper) 32%);
 }
 
 .star-mark {
@@ -653,6 +647,10 @@ main {
 }
 
 @media (max-width: 640px) {
+  main {
+    width: calc(100% - 1.25rem);
+    padding: 1rem 0 3rem;
+  }
   .dim-cols {
     grid-template-columns: 1fr;
   }
@@ -662,15 +660,20 @@ main {
   .brand-text {
     display: none;
   }
-  .flash-card {
-    height: min(28rem, calc(100dvh - 13.5rem));
-    min-height: 15rem;
+  .chip {
+    font-size: 0.78rem;
+    padding: 0.28rem 0.65rem;
+  }
+  .flash-card,
+  .flash-face {
+    min-height: 10.5rem;
   }
   .flash-face {
-    padding: 1.1rem 1rem 0.9rem;
+    padding: 1rem 0.9rem 1rem;
   }
   .flash-body p {
-    font-size: 0.98rem;
+    font-size: 0.95rem;
+    line-height: 1.65;
   }
 }
 
