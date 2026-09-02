@@ -221,6 +221,15 @@
         <p class="hero-brand">${escapeHtml(brand)}<span class="hero-93">93</span></p>
         <h1>${escapeHtml(title)}｜考試練習</h1>
         <p>${nl(hero)}</p>
+        <p class="site-credit hero-credit">
+          網站製作人曾聖傑
+          <a class="ig-link" href="https://www.instagram.com/redyjohn/" target="_blank" rel="noopener noreferrer">
+            <svg class="ig-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path fill="currentColor" d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm0 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H7zm5 2.8A4.2 4.2 0 1 1 7.8 12 4.2 4.2 0 0 1 12 7.8zm0 2A2.2 2.2 0 1 0 14.2 12 2.2 2.2 0 0 0 12 9.8zM17.35 6.4a1.05 1.05 0 1 1-1.05 1.05 1.05 1.05 0 0 1 1.05-1.05z"/>
+            </svg>
+            <span>redyjohn</span>
+          </a>
+        </p>
         <div class="hero-actions">
           <button type="button" class="btn btn-primary btn-metallic-red" data-nav="practice">開始練習</button>
           <button type="button" class="btn btn-ghost btn-metallic-silver" data-nav="flash">閃卡背誦</button>
