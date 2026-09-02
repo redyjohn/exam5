@@ -8,6 +8,7 @@
     category: "all",
     index: 0,
     shuffled: false,
+    reviewOnly: false,
     order: [],
     flashOrder: [],
     showAnswer: false,
@@ -42,11 +43,30 @@
     return DATA.questions.filter((q) => q.type === "qa" || q.type === "scenarios");
   }
 
-  function filteredQuestions() {
+  function reviewIds() {
+    const p = loadProgress();
+    return new Set(
+      Object.entries(p)
+        .filter(([, v]) => v.status === "review")
+        .map(([id]) => id)
+    );
+  }
+
+  function baseQuestionList({ qaOnly = false } = {}) {
     let list = qaList();
+    if (qaOnly) list = list.filter((q) => q.type === "qa");
+    if (state.reviewOnly) {
+      const ids = reviewIds();
+      list = list.filter((q) => ids.has(q.id));
+    }
     if (state.category !== "all") {
       list = list.filter((q) => q.category === state.category);
     }
+    return list;
+  }
+
+  function filteredQuestions() {
+    const list = baseQuestionList();
     if (!state.order.length) {
       state.order = list.map((_, i) => i);
     }
@@ -63,10 +83,9 @@
   }
 
   function rebuildOrder() {
-    const list = qaList().filter(
-      (q) => state.category === "all" || q.category === state.category
-    );
-    state.order = state.shuffled
+    const list = baseQuestionList();
+    const shouldShuffle = state.shuffled || state.reviewOnly;
+    state.order = shouldShuffle
       ? shuffleIndices(list.length)
       : list.map((_, i) => i);
     state.index = 0;
@@ -74,11 +93,7 @@
   }
 
   function flashList() {
-    return qaList().filter(
-      (q) =>
-        q.type === "qa" &&
-        (state.category === "all" || q.category === state.category)
-    );
+    return baseQuestionList({ qaOnly: true });
   }
 
   function rebuildFlashOrder(doShuffle) {
@@ -145,6 +160,28 @@
     return `<span class="star-mark" aria-label="${n} 星重點">${"★".repeat(n)}</span> `;
   }
 
+  function categoryChips() {
+    return [
+      { id: "all", name: "全部" },
+      ...DATA.categories.filter((c) => c.id !== "case"),
+    ]
+      .map(
+        (c) =>
+          `<button type="button" class="chip ${
+            state.category === c.id ? "active" : ""
+          }" data-filter="${c.id}">${escapeHtml(c.name)}</button>`
+      )
+      .join("");
+  }
+
+  function reviewEmptyMessage() {
+    const anyReview = qaList().some((q) => getStatus(q.id) === "review");
+    if (anyReview && state.category !== "all") {
+      return "此單元沒有「再複習」題目，可切換到「全部」或取消再複習出題。";
+    }
+    return "目前沒有「再複習」題目。請先在練習或閃卡把要加強的題目標成再複習。";
+  }
+
   /* ---------- Views ---------- */
 
   function renderHome() {
@@ -168,6 +205,7 @@
       .join("");
 
     const brand = DATA.meta.brand || "BIM";
+    const edition = DATA.meta.edition || "榮耀93版";
     const title = DATA.meta.title || "BIM 顧客服務管理師";
     const hero = DATA.meta.hero || "";
     const caseBtn = hasCases()
@@ -179,12 +217,13 @@
 
     app.innerHTML = `
       <section class="hero">
-        <p class="hero-brand">${escapeHtml(brand)}</p>
+        <p class="edition-badge">${escapeHtml(edition)}</p>
+        <p class="hero-brand">${escapeHtml(brand)}<span class="hero-93">93</span></p>
         <h1>${escapeHtml(title)}｜考試練習</h1>
-        <p>${escapeHtml(hero)}</p>
+        <p>${nl(hero)}</p>
         <div class="hero-actions">
-          <button type="button" class="btn btn-primary" data-nav="practice">開始練習</button>
-          <button type="button" class="btn btn-ghost" data-nav="flash">閃卡背誦</button>
+          <button type="button" class="btn btn-primary btn-metallic-red" data-nav="practice">開始練習</button>
+          <button type="button" class="btn btn-ghost btn-metallic-silver" data-nav="flash">閃卡背誦</button>
           ${caseBtn}
         </div>
         <div class="stats-row">
@@ -200,22 +239,27 @@
 
   function renderPractice() {
     const cur = currentQuestion();
+    const chips = categoryChips();
     if (!cur) {
-      app.innerHTML = `<div class="empty">此單元尚無題目</div>`;
+      const empty = state.reviewOnly
+        ? `<div class="empty">${reviewEmptyMessage()}</div>`
+        : `<div class="empty">此單元尚無題目</div>`;
+      app.innerHTML = `
+        <div class="toolbar">
+          <h2>題目練習</h2>
+          <div class="filters">${chips}</div>
+        </div>
+        <div class="toolbar" style="margin-top:-0.5rem">
+          <span class="progress-mini">進度：已掌握 ${countKnown()} 題</span>
+          <button type="button" class="btn btn-sm btn-amber" data-action="review-quiz">
+            ${state.reviewOnly ? "取消再複習出題" : "再複習出題"}
+          </button>
+        </div>
+        ${empty}
+      `;
       return;
     }
     const { q, list, pos } = cur;
-    const chips = [
-      { id: "all", name: "全部" },
-      ...DATA.categories.filter((c) => c.id !== "case"),
-    ]
-      .map(
-        (c) =>
-          `<button type="button" class="chip ${
-            state.category === c.id ? "active" : ""
-          }" data-filter="${c.id}">${escapeHtml(c.name)}</button>`
-      )
-      .join("");
 
     let body = "";
     if (q.type === "scenarios") {
@@ -254,10 +298,15 @@
         <div class="filters">${chips}</div>
       </div>
       <div class="toolbar" style="margin-top:-0.5rem">
-        <span class="progress-mini">進度：已掌握 ${countKnown()} 題</span>
-        <button type="button" class="btn btn-sm btn-ghost" data-action="shuffle">
-          ${state.shuffled ? "取消隨機" : "隨機出題"}
-        </button>
+        <span class="progress-mini">進度：已掌握 ${countKnown()} 題${state.reviewOnly ? ` · 再複習出題 ${list.length} 題` : ""}</span>
+        <div class="hero-actions" style="gap:0.5rem">
+          <button type="button" class="btn btn-sm btn-ghost" data-action="shuffle">
+            ${state.shuffled && !state.reviewOnly ? "取消隨機" : "隨機出題"}
+          </button>
+          <button type="button" class="btn btn-sm btn-amber" data-action="review-quiz">
+            ${state.reviewOnly ? "取消再複習出題" : "再複習出題"}
+          </button>
+        </div>
       </div>
       ${body}
     `;
@@ -293,22 +342,27 @@
 
   function renderFlash() {
     const cur = currentFlash();
+    const chips = categoryChips();
     if (!cur) {
-      app.innerHTML = `<div class="empty">此單元無可閃卡題目</div>`;
+      const empty = state.reviewOnly
+        ? `<div class="empty">${reviewEmptyMessage()}</div>`
+        : `<div class="empty">此單元無可閃卡題目</div>`;
+      app.innerHTML = `
+        <div class="toolbar">
+          <h2>閃卡背誦</h2>
+          <div class="filters">${chips}</div>
+        </div>
+        <div class="toolbar" style="margin-top:-0.5rem">
+          <p class="progress-mini" style="margin:0">${state.reviewOnly ? "再複習出題" : "閃卡"}</p>
+          <button type="button" class="btn btn-sm btn-amber" data-action="review-quiz">
+            ${state.reviewOnly ? "取消再複習出題" : "再複習出題"}
+          </button>
+        </div>
+        ${empty}
+      `;
       return;
     }
     const { q, list, pos } = cur;
-    const chips = [
-      { id: "all", name: "全部" },
-      ...DATA.categories.filter((c) => c.id !== "case"),
-    ]
-      .map(
-        (c) =>
-          `<button type="button" class="chip ${
-            state.category === c.id ? "active" : ""
-          }" data-filter="${c.id}">${escapeHtml(c.name)}</button>`
-      )
-      .join("");
 
     app.innerHTML = `
       <div class="toolbar">
@@ -316,8 +370,13 @@
         <div class="filters">${chips}</div>
       </div>
       <div class="toolbar" style="margin-top:-0.5rem">
-        <p class="progress-mini" style="margin:0">第 ${pos + 1} / ${list.length} 張 · 點擊卡片翻面</p>
-        <button type="button" class="btn btn-sm btn-ghost" data-action="shuffle-flash">隨機出題</button>
+        <p class="progress-mini" style="margin:0">第 ${pos + 1} / ${list.length} 張 · 點擊卡片翻面${state.reviewOnly ? " · 再複習出題" : ""}</p>
+        <div class="hero-actions" style="gap:0.5rem">
+          <button type="button" class="btn btn-sm btn-ghost" data-action="shuffle-flash">隨機出題</button>
+          <button type="button" class="btn btn-sm btn-amber" data-action="review-quiz">
+            ${state.reviewOnly ? "取消再複習出題" : "再複習出題"}
+          </button>
+        </div>
       </div>
       <div class="flash-wrap">
         <div class="flash-card ${state.flashFlipped ? "flipped" : ""}" data-action="flip" role="button" tabindex="0">
@@ -488,8 +547,18 @@
     }
   }
 
+  function startReviewQuiz() {
+    state.reviewOnly = !state.reviewOnly;
+    if (state.reviewOnly) state.shuffled = true;
+    if (state.view === "flash") rebuildFlashOrder(true);
+    else rebuildOrder();
+    state.flashFlipped = false;
+    render();
+  }
+
   function go(view) {
     state.view = view;
+    state.reviewOnly = false;
     if (view === "cases") {
       state.caseId = null;
       state.caseRevealed = false;
@@ -563,6 +632,14 @@
     if (t.dataset.rate) {
       const id = currentId();
       if (id) markStatus(id, t.dataset.rate);
+      if (state.reviewOnly && t.dataset.rate !== "review") {
+        if (state.view === "flash") rebuildFlashOrder(true);
+        else rebuildOrder();
+        state.showAnswer = false;
+        state.flashFlipped = false;
+        render();
+        return;
+      }
       move(1);
       return;
     }
@@ -585,6 +662,8 @@
       } else if (a === "shuffle-flash") {
         rebuildFlashOrder(true);
         render();
+      } else if (a === "review-quiz") {
+        startReviewQuiz();
       } else if (a === "flip") {
         if (flashPointer) {
           const dx = e.clientX - flashPointer.x;

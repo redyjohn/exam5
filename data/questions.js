@@ -1,72 +1,73 @@
 window.BIM_DATA = {
   "meta": {
     "brand": "BIM",
+    "edition": "榮耀93版",
     "title": "BIM 顧客服務管理師",
-    "subtitle": "筆試、面試題庫（五）學霸解答 202410",
+    "subtitle": "筆試、面試題庫（五）學霸解答 202410 · 榮耀93版",
     "org": "台灣服務禮儀品質管理協會",
     "trainer": "興誠服務品質管理訓練機構",
-    "hero": "依 202410 學霸解答練習筆試與面試：服務理念、儀態問候、溝通電話、顧客抱怨、綜合與學霸篇。"
+    "hero": "祝各位辛苦的人招夥伴們93軍人節快樂！\n努力不會白費，今日種下的種子定會在未來的某一天開花結果！"
   },
   "categories": [
     {
       "id": "philosophy",
       "name": "服務理念篇",
       "desc": "不上門原因、莫拉賓、ISQM 構面與 BIM 八大單元",
-      "color": "#0d6e6e"
+      "color": "#003366"
     },
     {
       "id": "expression",
       "name": "表情聲音篇",
       "desc": "微笑三技巧與 La 音調",
-      "color": "#1a5f7a"
+      "color": "#001F3F"
     },
     {
       "id": "posture",
       "name": "儀態篇",
       "desc": "站姿、引導手勢、陪同與電梯禮儀",
-      "color": "#2c4a6e"
+      "color": "#1a4a73"
     },
     {
       "id": "appearance",
       "name": "容貌服裝篇",
       "desc": "服裝色系與容貌打扮關鍵",
-      "color": "#3d5a4c"
+      "color": "#2c5a7a"
     },
     {
       "id": "greeting",
       "name": "問候篇",
       "desc": "擁抱、鞠躬、合掌與握手禮",
-      "color": "#5c4a2e"
+      "color": "#C8102E"
     },
     {
       "id": "communication",
       "name": "溝通篇",
       "desc": "非語言溝通、行為式與個性式溝通",
-      "color": "#6b3d4a"
+      "color": "#4a6a85"
     },
     {
       "id": "phone",
       "name": "電話接待篇",
       "desc": "接聽四大要點與七大步驟",
-      "color": "#4a3d6b"
+      "color": "#003366"
     },
     {
       "id": "complaint",
       "name": "顧客抱怨篇",
       "desc": "抱怨時效、原因與禁止動作",
-      "color": "#8a3d2e"
+      "color": "#C8102E"
     },
     {
       "id": "comprehensive",
       "name": "綜合篇",
       "desc": "奉茶、電梯、引導、名片與服務構面應用",
-      "color": "#1f6b45"
+      "color": "#001F3F"
     },
     {
       "id": "scholar",
       "name": "學霸篇",
       "desc": "直接感受構面、禁菸勸導、歡送與客訴流程",
-      "color": "#b7791f"
+      "color": "#9E0D24"
     }
   ],
   "questions": [
