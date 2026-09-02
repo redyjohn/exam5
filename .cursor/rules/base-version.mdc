@@ -1,0 +1,17 @@
+---
+description: 基礎版設計還原點。使用者說「恢復基礎版」時必須還原到 git tag base。
+alwaysApply: true
+---
+
+# 基礎版（base）
+
+目前網站的基礎版是 git tag `base`（commit `9ba3e20`，閃卡改為隨內容長高、RWD 不溢出版）。
+
+當使用者說「恢復基礎版」「回到基礎版」或同等意思時：
+
+1. 用 tag `base` 還原網站檔，不要憑記憶重做：
+   `git checkout base -- index.html app.js styles.css data/questions.js`
+2. 還原後檢查閃卡在手機與桌機都不會超出卡片框。
+3. 若 tag 不在本地，先 `git fetch origin tag base`。
+
+基礎版重點：閃卡用 grid 疊兩面、高度隨內容撐開、小螢幕縮小內距與字級；練習／閃卡可顯示 ★★／★★★。
