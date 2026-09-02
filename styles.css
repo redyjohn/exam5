@@ -450,16 +450,17 @@ main {
 /* Flashcard */
 .flash-wrap {
   perspective: 1200px;
-  min-height: 280px;
 }
 
 .flash-card {
   position: relative;
   width: 100%;
-  min-height: 280px;
+  height: min(42rem, calc(100dvh - 14rem));
+  min-height: 17.5rem;
   transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
   cursor: pointer;
+  overflow: hidden;
 }
 
 .flash-card.flipped {
@@ -470,14 +471,15 @@ main {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: var(--shadow);
-  padding: 1.75rem;
+  padding: 1.25rem 1.2rem 1.15rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  min-height: 0;
 }
 
 .flash-face.back {
@@ -486,21 +488,50 @@ main {
 }
 
 .flash-hint {
+  flex-shrink: 0;
   font-size: 0.8rem;
   color: var(--ink-soft);
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.7rem;
+}
+
+.flash-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0.45rem 0.85rem 0;
+  display: grid;
+  align-content: start;
+  scrollbar-width: thin;
+  scrollbar-color: #c5d2da transparent;
+}
+
+.flash-body p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.flash-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.flash-body::-webkit-scrollbar-thumb {
+  background: #c5d2da;
+  border-radius: 99px;
+}
+
+.flash-body::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .star-mark {
   color: #e8b923;
   letter-spacing: 0.06em;
   font-weight: 700;
-}
-
-.flash-face p {
-  margin: 0;
-  font-size: 1.1rem;
-  white-space: pre-wrap;
 }
 
 /* Scenarios */
@@ -630,6 +661,16 @@ main {
   }
   .brand-text {
     display: none;
+  }
+  .flash-card {
+    height: min(28rem, calc(100dvh - 13.5rem));
+    min-height: 15rem;
+  }
+  .flash-face {
+    padding: 1.1rem 1rem 0.9rem;
+  }
+  .flash-body p {
+    font-size: 0.98rem;
   }
 }
 

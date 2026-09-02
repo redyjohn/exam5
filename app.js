@@ -323,11 +323,15 @@
         <div class="flash-card ${state.flashFlipped ? "flipped" : ""}" data-action="flip" role="button" tabindex="0">
           <div class="flash-face front">
             <div class="flash-hint">${escapeHtml(catName(q.category))} · 問題</div>
-            <p>${starHtml(q)}${nl(q.q)}</p>
+            <div class="flash-body">
+              <p>${starHtml(q)}${nl(q.q)}</p>
+            </div>
           </div>
           <div class="flash-face back">
             <div class="flash-hint">參考答案</div>
-            <p>${nl(q.a)}</p>
+            <div class="flash-body">
+              <p>${nl(q.a)}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -459,14 +463,29 @@
     `;
   }
 
-  function render() {
+  function render(opts = {}) {
     setNavActive();
     if (state.view === "home") renderHome();
     else if (state.view === "practice") renderPractice();
     else if (state.view === "flash") renderFlash();
     else if (state.view === "cases") renderCases();
     else if (state.view === "progress") renderProgress();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!opts.keepScroll) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  function flipFlash() {
+    state.flashFlipped = !state.flashFlipped;
+    const card = document.querySelector(".flash-card");
+    if (card) {
+      card.classList.toggle("flipped", state.flashFlipped);
+      card.querySelectorAll(".flash-body").forEach((el) => {
+        el.scrollTop = 0;
+      });
+    } else {
+      render({ keepScroll: true });
+    }
   }
 
   function go(view) {
@@ -500,6 +519,14 @@
     state.flashFlipped = false;
     render();
   }
+
+  let flashPointer = null;
+
+  document.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".flash-card")) {
+      flashPointer = { x: e.clientX, y: e.clientY };
+    }
+  });
 
   document.addEventListener("click", (e) => {
     const t = e.target.closest("[data-nav],[data-open-cat],[data-filter],[data-action],[data-rate],[data-rate-case],[data-case]");
@@ -559,8 +586,18 @@
         rebuildFlashOrder(true);
         render();
       } else if (a === "flip") {
-        state.flashFlipped = !state.flashFlipped;
-        render();
+        if (flashPointer) {
+          const dx = e.clientX - flashPointer.x;
+          const dy = e.clientY - flashPointer.y;
+          flashPointer = null;
+          if (dx * dx + dy * dy > 64) return;
+        }
+        const body = e.target.closest(".flash-body");
+        if (body) {
+          const rect = body.getBoundingClientRect();
+          if (e.clientX >= rect.right - 16) return;
+        }
+        flipFlash();
       } else if (a === "reveal-scenarios") {
         document.querySelectorAll(".scenario-item").forEach((el) => el.classList.add("revealed"));
       } else if (a === "reveal-case") {
@@ -584,8 +621,7 @@
     if (state.view === "flash") {
       if (e.key === " " || e.key === "Enter") {
         e.preventDefault();
-        state.flashFlipped = !state.flashFlipped;
-        render();
+        flipFlash();
       } else if (e.key === "ArrowRight") move(1);
       else if (e.key === "ArrowLeft") move(-1);
     }
